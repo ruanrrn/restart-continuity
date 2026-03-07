@@ -1,0 +1,13 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="640" fill="#F4F1EA"/>
+  <rect x="48" y="48" width="1184" height="544" rx="28" fill="#2D3142"/>
+  <rect x="84" y="84" width="230" height="40" rx="20" fill="#EF8354"/>
+  <text x="106" y="110" fill="#2D3142" font-family="Georgia, serif" font-size="24" font-weight="700">OpenClaw Skill</text>
+  <text x="84" y="220" fill="#FFFFFF" font-family="Georgia, serif" font-size="76" font-weight="700">Restart Continuity</text>
+  <text x="84" y="296" fill="#BFC0C0" font-family="Arial, sans-serif" font-size="30">Resume active work cleanly after restarts instead of making users repeat themselves.</text>
+  <text x="84" y="356" fill="#EAEAEA" font-family="Arial, sans-serif" font-size="26">Persist the top task, carry the critical IDs, and come back with context intact.</text>
+  <circle cx="1030" cy="190" r="78" fill="#EF8354"/>
+  <circle cx="940" cy="340" r="56" fill="#4F5D75"/>
+  <circle cx="1125" cy="375" r="110" fill="#BFC0C0"/>
+  <path d="M910 475C955 430 1025 420 1085 448C1140 474 1185 482 1220 450" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+</svg>
