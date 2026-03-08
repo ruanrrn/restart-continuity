@@ -9,7 +9,7 @@ Good contributions:
 - clearer restart-prep and restart-recovery rules
 - better examples of `memory/active-task.md` usage and fallback cron handling
 - README improvements that make standalone restart continuity usage clearer
-- packaging or repository polish that keeps the repo focused
+- bilingual documentation or packaging polish that keeps the repo focused
 
 Avoid:
 
@@ -22,7 +22,8 @@ Avoid:
 1. Make the smallest useful change.
 2. Keep README claims aligned with the actual skill behavior.
 3. Regenerate `dist/restart-continuity.skill` after material skill changes.
-4. Prefer operational examples over vague advice.
+4. If docs change, keep `README.md` and `README.zh-CN.md` aligned.
+5. Prefer operational examples over vague advice.
 
 ## Pull request guidance
 
@@ -31,6 +32,7 @@ A good PR should explain:
 - what changed
 - why the change improves restart-safe recovery
 - whether `dist/restart-continuity.skill` was regenerated
+- whether both READMEs still describe the same scope
 
 ## Repo principle
 

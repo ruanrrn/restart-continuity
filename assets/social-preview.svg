@@ -1,13 +1,27 @@
 <svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect width="1280" height="640" fill="#F4F1EA"/>
   <rect x="48" y="48" width="1184" height="544" rx="28" fill="#2D3142"/>
-  <rect x="84" y="84" width="230" height="40" rx="20" fill="#EF8354"/>
-  <text x="106" y="110" fill="#2D3142" font-family="Georgia, serif" font-size="24" font-weight="700">OpenClaw Skill</text>
-  <text x="84" y="220" fill="#FFFFFF" font-family="Georgia, serif" font-size="76" font-weight="700">Restart Continuity</text>
-  <text x="84" y="296" fill="#BFC0C0" font-family="Arial, sans-serif" font-size="30">Resume active work cleanly after restarts instead of making users repeat themselves.</text>
-  <text x="84" y="356" fill="#EAEAEA" font-family="Arial, sans-serif" font-size="26">Persist the top task, carry the critical IDs, and come back with context intact.</text>
-  <circle cx="1030" cy="190" r="78" fill="#EF8354"/>
-  <circle cx="940" cy="340" r="56" fill="#4F5D75"/>
-  <circle cx="1125" cy="375" r="110" fill="#BFC0C0"/>
-  <path d="M910 475C955 430 1025 420 1085 448C1140 474 1185 482 1220 450" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+  <rect x="88" y="84" width="230" height="40" rx="20" fill="#EF8354"/>
+  <text x="110" y="110" fill="#2D3142" font-family="Georgia, serif" font-size="24" font-weight="700">OpenClaw Skill</text>
+
+  <text x="88" y="214" fill="#FFFFFF" font-family="Georgia, serif" font-size="76" font-weight="700">Restart</text>
+  <text x="88" y="290" fill="#EF8354" font-family="Georgia, serif" font-size="76" font-weight="700">Continuity</text>
+  <text x="88" y="358" fill="#EAEAEA" font-family="Arial, sans-serif" font-size="32">Resume active work cleanly after restarts</text>
+  <text x="88" y="400" fill="#BFC0C0" font-family="Arial, sans-serif" font-size="32">instead of making users repeat themselves.</text>
+  <text x="88" y="462" fill="#EAEAEA" font-family="Arial, sans-serif" font-size="26">Persist the top task, carry the critical IDs,</text>
+  <text x="88" y="500" fill="#BFC0C0" font-family="Arial, sans-serif" font-size="26">and come back with context intact.</text>
+
+  <path d="M724 126C724 111.641 735.641 100 750 100H778C792.359 100 804 111.641 804 126V514C804 528.359 792.359 540 778 540H750C735.641 540 724 528.359 724 514V126Z" fill="#FFFFFF" fill-opacity="0.09"/>
+  <path d="M838 168C838 154.745 848.745 144 862 144H1142C1155.25 144 1166 154.745 1166 168V248C1166 261.255 1155.25 272 1142 272H862C848.745 272 838 261.255 838 248V168Z" fill="#4F5D75"/>
+  <path d="M874 196C874 189.373 879.373 184 886 184H978C984.627 184 990 189.373 990 196V208C990 214.627 984.627 220 978 220H886C879.373 220 874 214.627 874 208V196Z" fill="#EF8354"/>
+  <path d="M874 232C874 225.373 879.373 220 886 220H1086C1092.63 220 1098 225.373 1098 232V242C1098 248.627 1092.63 254 1086 254H886C879.373 254 874 248.627 874 242V232Z" fill="#EAEAEA"/>
+
+  <path d="M812 306C812 292.745 822.745 282 836 282H1124C1137.25 282 1148 292.745 1148 306V394C1148 407.255 1137.25 418 1124 418H836C822.745 418 812 407.255 812 394V306Z" fill="#FFFFFF" fill-opacity="0.08" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="4"/>
+  <circle cx="872" cy="350" r="26" fill="#EF8354"/>
+  <path d="M924 330C924 323.373 929.373 318 936 318H1064C1070.63 318 1076 323.373 1076 330V342C1076 348.627 1070.63 354 1064 354H936C929.373 354 924 348.627 924 342V330Z" fill="#FFFFFF"/>
+  <path d="M924 366C924 359.373 929.373 354 936 354H1100C1106.63 354 1112 359.373 1112 366V376C1112 382.627 1106.63 388 1100 388H936C929.373 388 924 382.627 924 376V366Z" fill="#BFC0C0"/>
+
+  <path d="M850 448C850 434.745 860.745 424 874 424H1106C1119.25 424 1130 434.745 1130 448V500C1130 513.255 1119.25 524 1106 524H874C860.745 524 850 513.255 850 500V448Z" fill="#EF8354" fill-opacity="0.14" stroke="#EF8354" stroke-width="4"/>
+  <path d="M886 462H918L938 482L972 446" stroke="#F4F1EA" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M964 468C964 461.373 969.373 456 976 456H1072C1078.63 456 1084 461.373 1084 468V480C1084 486.627 1078.63 492 1072 492H976C969.373 492 964 486.627 964 480V468Z" fill="#F4F1EA"/>
 </svg>

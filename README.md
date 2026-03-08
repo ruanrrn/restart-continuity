@@ -1,11 +1,14 @@
 # Restart Continuity
 
+English | [简体中文](README.zh-CN.md)
+
 ![Restart Continuity banner](assets/social-preview.svg)
 
 ![OpenClaw Skill](https://img.shields.io/badge/OpenClaw-Skill-2D3142?style=flat-square)
 ![Focus-Restart Recovery](https://img.shields.io/badge/Focus-Restart%20Recovery-EF8354?style=flat-square&labelColor=2D3142)
 ![Works-Standalone](https://img.shields.io/badge/Works-Standalone-EAEAEA?style=flat-square&labelColor=4F5D75)
 ![Artifact-.skill Included](https://img.shields.io/badge/Artifact-.skill%20Included-BFC0C0?style=flat-square&labelColor=4F5D75)
+![README-Bilingual](https://img.shields.io/badge/README-Bilingual-EAEAEA?style=flat-square&labelColor=4F5D75)
 ![License-MIT](https://img.shields.io/badge/License-MIT-EAEAEA?style=flat-square&labelColor=2D3142)
 
 Preserve and resume in-flight OpenClaw work across gateway restarts without amnesia.
@@ -113,9 +116,9 @@ A good agent should:
 
 These are related, not required:
 
-- `task-orchestrator`: adds multitask scheduling and prioritization — <https://github.com/ruanrrn/task-orchestrator>
-- `task-state-sync`: keeps continuity files accurate during live work — <https://github.com/ruanrrn/task-state-sync>
-- `multi-task-continuity`: bundles orchestration, state sync, and restart-safe recovery — <https://github.com/ruanrrn/multi-task-continuity>
+- `task-orchestrator`: adds multitask scheduling and prioritization - <https://github.com/ruanrrn/task-orchestrator>
+- `task-state-sync`: keeps continuity files accurate during live work - <https://github.com/ruanrrn/task-state-sync>
+- `multi-task-continuity`: bundles orchestration, state sync, and restart-safe recovery - <https://github.com/ruanrrn/multi-task-continuity>
 
 If restart recovery is the main pain, use this repo alone.
 
@@ -150,6 +153,7 @@ Use either path:
 restart-continuity/
 ├── LICENSE
 ├── README.md
+├── README.zh-CN.md
 ├── CONTRIBUTING.md
 ├── assets/
 │   └── social-preview.svg
