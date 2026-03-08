@@ -11,143 +11,134 @@
 ![README-Bilingual](https://img.shields.io/badge/README-Bilingual-EAEAEA?style=flat-square&labelColor=4F5D75)
 ![License-MIT](https://img.shields.io/badge/License-MIT-EAEAEA?style=flat-square&labelColor=2D3142)
 
-让 OpenClaw 在 gateway 重启后继续干活，而不是像失忆了一样让用户重新解释一遍。
+让 OpenClaw 在 gateway 重启前后保住正在进行的任务，并在恢复后带着可用上下文把工作接回来。
 
-## Quick pitch
+## 概览
 
-把正在进行的任务在重启前记清楚、重启后接回来，别把“继续”这件事甩给用户。
-保住顶层任务、关键 ID 和下一步动作，回来就接着干。
+`restart-continuity` 是一个边界明确的 OpenClaw skill，专门处理“重启之后怎么不断片”这件事。
 
-## Why this exists
+它规定代理在重启前如何保存当前顶层任务、关键标识和精确下一步，也规定重启后如何优先恢复这项工作，并在第一条实质性回复里主动告诉用户恢复了什么。
 
-重启不该等于上下文清零。现实里最烦人的情况就是：gateway 半路重启，代理像被雷劈了一样忘了自己刚才在做什么，然后还得用户手动提醒“继续”。这不叫中断恢复，这叫流程摆烂。
+这个仓刻意保持克制。它可以独立使用，但不会顺手把多任务编排、日常状态维护或其他泛化工作流策略都塞进来。
 
-OpenClaw 虽然有内建的重启后 ping，但光靠那个还不够。要想恢复靠谱，必须在重启前把状态记扎实，重启后第一时间把正确的任务续上。
+## 为什么需要它
 
-`restart-continuity` 干的就是这件事。
+重启应该像短暂断电，不该像当场失忆。
 
-它给代理一条很聚焦的工作流，用来：
+现实里的常见翻车方式很固定：代理忘了真正的顶层任务，丢了 approval ID、job ID、进程状态或本来该在恢复后发给用户的说明，然后用户只能重新解释一遍已在进行中的工作。这个体验既低效，也不专业。
 
-- 在重启前持久化当前顶层任务
-- 记录重启后还需要的关键 ID
-- 为主动重启安排兜底提醒
-- 重启后优先恢复正确任务
-- 主动告诉用户恢复了什么
+`restart-continuity` 的存在，就是把这类失败模式收口成一套可执行的操作规范：在中断前把该保存的东西保存好，在恢复后先把正确任务接上，而不是等用户来兜底。
 
-## Works independently
+## 适用范围
 
-`restart-continuity` 单独用就成立。
+当主要问题是“如何跨过重启边界继续工作”时，就该用这个仓。
 
-哪怕你不引入更大的多任务编排或状态同步技能，它也已经能明显改善：
+适合这些场景：
 
-- 重启前准备
-- 重启后恢复准确度
-- fallback cron 处理
-- 顶层任务连续性
-- 重启后的主动用户更新
+- gateway 计划重启，但进行中的工作不能断片
+- 某个任务已经跨过一次重启，需要被明确恢复
+- 助手需要把当前顶层未完成任务和下一步动作持久化
+- approval、job、session、端口、文件路径等活跃标识必须跨重启保留
+- 助手需要在重启后主动告诉用户恢复了什么
 
-别的仓可以互补，但这个仓本身不靠它们才讲得通。
+不适合这些场景：
 
-## Family role
+- 正常工作期间的多任务优先级调度
+- 没有重启参与时的连续性文件日常同步
+- 与重启无关的泛化工作流治理
 
-在这一组 repo 里，`restart-continuity` 是专门守重启边界的那一个。
+一句话：它管的是重启边界本身，不是系统里所有 continuity 问题。
 
-当核心问题发生在“重启前后这道坎”上时，就该用它：保住顶层任务、跨重启带上关键 ID、回来后先恢复正确 lane。
+## Skill 覆盖内容
 
-别把它膨胀成泛化状态维护包。如果真正的问题是工作进行中 `TODO.md` 和 `memory/active-task.md` 会漂，那是 `task-state-sync` 的地盘；如果问题是整个多任务操作模型，那是 `multi-task-continuity` 的范围。
+这个 skill 把真正决定“重启恢复靠不靠谱”的操作环节标准化：
 
-## What the skill teaches
+- 在重启前更新 `memory/active-task.md`，写清真实顶层任务、当前状态、阻塞、下一步，以及恢复后要发给用户的更新
+- 记录重启后仍然重要的活跃标识，包括 approval、job ID、session、进程、端口和文件路径
+- 对计划内重启创建一次性的 fallback cron，并持久化它的 `jobId`
+- 在安全且不阻塞时，于重启后立刻恢复顶层未完成任务
+- 在恢复后的第一条实质性回复里主动说明恢复了什么
+- 恢复成功后清理陈旧 fallback 状态，避免留下脏恢复轨迹
 
-这个 skill 会要求代理：
+## 工作流概览
 
-- 在重启前更新 `memory/active-task.md`，写清目标、状态、阻塞、下一步和重启后要发给用户的话
-- 记录审批 ID、job ID、session、进程、端口、文件路径等活跃标识
-- 对主动重启安排一次性的 cron fallback，并保存返回的 `jobId`
-- 重启后在安全前提下立刻恢复顶层未完成任务
-- 在第一条实质性回复里告诉用户恢复了什么、接下来做什么
-- 恢复成功后清理过期的 fallback 状态
+一次标准的 `restart-continuity` 执行通常是这样：
 
-## When to use it
+1. 在重启前把真实顶层任务写入 `memory/active-task.md`。
+2. 持久化重启后恢复所需的关键标识和精确下一步。
+3. 为计划内重启安排一次性的 fallback cron job。
+4. 确认恢复线索完整后再执行重启。
+5. 重启后优先读取 `memory/active-task.md`，恢复顶层未完成任务。
+6. 主动告诉用户恢复了什么，然后清理陈旧 fallback 状态。
 
-这些场景就该上 `restart-continuity`：
+## 何时使用
 
-- 任务会跨越重启，无论计划内还是计划外
-- 需要重启 gateway，但工作不能断片
-- 助手必须主动继续重启前的任务
-- 关键 ID 必须跨重启保留下来
-- 长流程任务承受不起重启失忆
+当核心问题不是“这个工作流平时该怎么设计”，而是“重启之后怎么别把当前任务弄丢”，就该拿出 `restart-continuity`。
 
-## Example behavior
+典型触发语句包括：
 
-### Example 1: 进行中的任务遇到计划内重启
+- “把 gateway 重启了，但这个发布任务要能接着跑。”
+- “我们刚在工作中途重启过，先恢复正确任务。”
+- “重启前把 approvals 和下一步记下来。”
+- “任务恢复后主动给用户发个更新。”
 
-比如正在发布仓库，中途必须重启 gateway。
+## 代表性结果
 
-靠谱的代理应该：
+### 进行中的任务遇到计划内重启
 
-1. 先把真实顶层任务写进 `memory/active-task.md`
-2. 记录关键 ID 和精确下一步
-3. 安排 fallback cron job
-4. 把 fallback `jobId` 写回 `memory/active-task.md`
-5. 确认恢复线索真实存在后再重启
+比如仓库发布、代码审查或调试任务做到一半，必须先重启 gateway。
 
-### Example 2: 重启后的恢复
+靠谱的代理应该先写清真实顶层任务，保存关键 ID，安排 fallback cron，然后只在恢复指引已经可靠落盘之后才重启。
 
-gateway 在一次计划内重启后重新上线。
+### 重启后的恢复
 
-靠谱的代理应该：
+环境在一次计划内或计划外重启之后重新上线。
 
-1. 在做别的事之前先读 `memory/active-task.md`
-2. 只要安全且不阻塞，就立刻恢复顶层未完成任务
-3. 在第一条实质性回复里发出预先准备好的用户更新
-4. 确认恢复成功后移除 fallback cron job
+靠谱的代理应该在做其他事之前先读 `memory/active-task.md`，在安全前提下恢复顶层未完成任务，并在第一条实质性回复里告诉用户恢复了什么。
 
-### Example 3: 重启后把任务收尾
+### 恢复成功后的清理
 
-恢复后的任务顺利完成。
+恢复后的任务完成了，或者另一个未完成任务变成新的主任务。
 
-靠谱的代理应该：
+靠谱的代理应该清理陈旧重启状态、移除 fallback cron，并清空或重写 `memory/active-task.md`，让当前顶层任务始终准确。
 
-1. 如果没有新的顶层任务，就清空 `memory/active-task.md`
-2. 如果还有后续任务，就重写它，让下一个未完成任务变成新的顶层任务
-3. 不要留下过期审批 ID 或陈旧的下一步
+## 相关 skill 仓
 
-## Related skills
+这些仓库是相关示例，不是必需依赖：
 
-这些是相关项，不是依赖项：
+- `task-orchestrator`：偏编排的配套仓，负责多任务调度与优先级 —— <https://github.com/ruanrrn/task-orchestrator>
+- `task-state-sync`：偏状态准确性的配套仓，负责在实时工作中保持连续性文件一致 —— <https://github.com/ruanrrn/task-state-sync>
+- `multi-task-continuity`：总包型仓库，把编排、状态同步和重启恢复合在一起 —— <https://github.com/ruanrrn/multi-task-continuity>
 
-- `task-orchestrator`：补上多任务调度和优先级 - <https://github.com/ruanrrn/task-orchestrator>
-- `task-state-sync`：保持连续性文件在工作过程中不漂 - <https://github.com/ruanrrn/task-state-sync>
-- `multi-task-continuity`：把编排、状态同步和重启恢复打成一个总包 - <https://github.com/ruanrrn/multi-task-continuity>
+如果主要故障点就发生在重启边界，从这个仓开始。
 
-如果真正的痛点就是重启恢复，这个仓单独用就够。
+## 安装
+
+两种方式都可以：
+
+1. 直接把 `dist/restart-continuity.skill` 导入到 OpenClaw 环境。
+2. 如果你需要可编辑源码，就把 `restart-continuity/` 复制到你的 skills 目录。
+
+## 仓库内容
+
+- `restart-continuity/` - skill 源码
+- `dist/restart-continuity.skill` - 可直接导入的打包产物
+- `assets/social-preview.svg` - 仓库 banner 和建议使用的 social-preview 资源
 
 ## Social preview
 
-建议 social preview 资源：`assets/social-preview.svg`
+建议使用的 social preview 资源：`assets/social-preview.svg`
 
 建议一句话文案：
 
-> Resume active work cleanly after restarts instead of making users repeat themselves.
+> Preserve and resume in-flight work across restarts without losing the active task.
 
 GitHub 备注：
 
 - 当前公开的 `gh` CLI 和 GraphQL `UpdateRepositoryInput` 都没有可写的 custom social preview 字段。
-- 如果你要把这张图真正设成仓库 social preview，只能去 GitHub 仓库设置页手动上传 `assets/social-preview.svg`。
+- 如果要把这张图真正设成仓库 social preview，仍然需要到 GitHub 仓库设置页手动上传 `assets/social-preview.svg`。
 
-## What you get
-
-- `restart-continuity/` - skill 源码
-- `dist/restart-continuity.skill` - 可直接导入的打包产物
-
-## Install
-
-两种方式都可以：
-
-1. 直接导入 `dist/restart-continuity.skill`
-2. 把 `restart-continuity/` 复制到你的 skills 目录，按源码方式使用
-
-## Repository layout
+## 仓库结构
 
 ```text
 restart-continuity/
@@ -163,17 +154,18 @@ restart-continuity/
     └── restart-continuity.skill
 ```
 
-## Contributing
+## 贡献
 
-见 `CONTRIBUTING.md`，里面写了贡献范围、PR 预期，以及怎么保证这个仓继续专注于重启恢复，而不是演变成一个什么都往里塞的 continuity 杂货铺。
+见 `CONTRIBUTING.md`。里面写明了贡献范围、PR 预期，以及如何把这个仓继续收口在“重启恢复”上，而不是滑坡成更宽泛的 continuity 工具箱。
 
-## Release hygiene
+## 发布卫生
 
-- skill 有实质改动后，要重新生成 `dist/restart-continuity.skill`
-- 仓库描述要和 skill 的触发语义保持一致
-- 仓库保持克制和实用，别塞无关调试杂物
+- skill 有实质改动后，重新生成 `dist/restart-continuity.skill`
+- 保持 `README.md`、`README.zh-CN.md`、`SKILL.md` 和仓库 metadata 一致
+- 维持窄而清晰的边界：先管好 restart continuity，其他工作流问题交给别的仓
+- 及时移除陈旧的重启示例、ID 或文案，别让仓库看起来像它负责了更多东西
 
-## Repository
+## 仓库信息
 
 - GitHub: `https://github.com/ruanrrn/restart-continuity`
 - License: MIT
