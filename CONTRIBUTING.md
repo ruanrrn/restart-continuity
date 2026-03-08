@@ -35,3 +35,4 @@ A good PR should explain:
 ## Repo principle
 
 This repo should remain the restart-recovery specialist of the family, not a catch-all continuity bundle.
+Do not turn restart-boundary recovery into generic state-sync policy or umbrella multitask orchestration.

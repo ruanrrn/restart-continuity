@@ -45,6 +45,14 @@ Use it even if you do not adopt broader multitask orchestration or state-sync sk
 
 Other repos may complement it, but they are not required for this repo to make sense.
 
+## Family role
+
+Within this repo family, `restart-continuity` is the restart-boundary specialist.
+
+Use it when the core failure happens at the restart boundary: preserving the top task, carrying the critical IDs across restart, and proactively resuming the right lane first.
+
+Do not bloat it into general state maintenance. If the main problem is ongoing drift between `TODO.md` and `memory/active-task.md` during live work, that belongs to `task-state-sync`. If the main problem is the whole multitask operating model, that belongs to `multi-task-continuity`.
+
 ## What the skill teaches
 
 The skill tells the agent to:
