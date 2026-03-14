@@ -1,116 +1,89 @@
 # Restart Continuity
 
-English | [简体中文](README.zh-CN.md)
+![Engage | [RESTART CONTINUITY BANNER](assets/social-preview.svg)
+![Focus State Recovery](https://img.shields.io/badge/focus-state_recovery-success?style=flat-square&labelColor=18324A)
 
-![Restart Continuity banner](assets/social-preview.svg)
-
-![OpenClaw Skill](https://img.shields.io/badge/OpenClaw-Skill-2D3142?style=flat-square)
-![Focus-Restart Recovery](https://img.shields.io/badge/Focus-Restart%20Recovery-EF8354?style=flat-square&labelColor=2D3142)
-![Works-Standalone](https://img.shields.io/badge/Works-Standalone-EAEAEA?style=flat-square&labelColor=4F5D75)
-![Artifact-.skill Included](https://img.shields.io/badge/Artifact-.skill%20Included-BFC0C0?style=flat-square&labelColor=4F5D75)
-![README-Bilingual](https://img.shields.io/badge/README-Bilingual-EAEAEA?style=flat-square&labelColor=4F5D75)
-![License-MIT](https://img.shields.io/badge/License-MIT-EAEAEA?style=flat-square&labelColor=2D3142)
-
-Preserve and resume in-flight OpenClaw work across gateway restarts so active tasks survive the restart boundary with usable context.
+An OpenClaw skill for preserving and resuming in-flight work across gateway restarts, session resets, and planned restarts.
 
 ## Overview
 
-`restart-continuity` is a narrowly scoped OpenClaw skill for restart-safe recovery.
+`restart-continuity` is a narrow-scope OpenClaw skill for restart-safe recovery.
 
-It tells an agent how to preserve the top active task before a restart, carry forward the identifiers and next action that still matter afterward, and proactively resume that work once the environment is back.
+It tells an agent how to:
 
-The repo is intentionally focused. It is useful on its own, and it does not try to absorb broader multitask orchestration, general state maintenance, or unrelated workflow policy.
+- preserve the active top task before a restart
+- resume that task immediately after restart
+- send the user a proactive restart update
+- schedule one-shot fallback cron jobs for intentional restarts
+
+The repo is intentionally small. It does not choose scheduling strategy, manage broad task workflow policy, or orchestrate parallel work. It exists to restart-safely recover the active task, carry forward identifiers and next action that would otherwise be lost, and proactively resume what work once the environment is back.
 
 ## Why this exists
 
-A restart should behave like a short blackout, not a memory wipe.
+In practice, agents often lose the exact task state, important IDs, job IDs, process IDs, sessions, or user-facing follow-up messages that should survive a restart. The result is predictable: the user has to restart work that was already in progress, and the assistant looks unhelpful.
 
-In practice, agents often lose the exact task, approval IDs, job IDs, process state, or user-facing follow-up message that should survive a restart. The result is predictable: the user has to restate work that was already in progress, and the assistant looks unreliable.
-
-`restart-continuity` exists to make that failure mode explicit and fixable. It provides a repeatable operational pattern for capturing the right restart state before interruption and resuming the correct task first after recovery.
+`restart-continuity` exists to make that failure mode explicit and fixable.
 
 ## Scope
 
-Use this repo when the main problem is restart-boundary continuity.
+Use this skill when the main problem is restart-boundary continuity:
 
-Good fit:
+- a gateway restart is planned or happened
+- a task spans restarts and should resume automatically
+- the assistant must proactively continue the pre-restart task and tell the user what resumed
+- the active top task must be tracked in `memory/active-task.md`
 
-- a gateway restart is planned and active work must survive it
-- a task already spans a restart and should be resumed deliberately
-- the assistant must persist the top unfinished task and its next action
-- live identifiers such as approvals, jobs, sessions, ports, or file paths must survive the restart boundary
-- the assistant should proactively tell the user what resumed after restart
+## What this skill covers
 
-Not a fit:
+The skill standardizes the operational processes that Determian whether restart recovery works correctly:
 
-- ongoing multitask prioritization during normal work
-- generic synchronization between continuity files while no restart is involved
-- broad workflow governance unrelated to restarts
-
-Use `restart-continuity` for the restart boundary itself, not for every continuity problem in the system.
-
-## What the skill covers
-
-The skill standardizes the operational pieces that determine whether restart recovery is trustworthy:
-
-- update `memory/active-task.md` before restart with the real top task, current status, blockers, next action, and queued user-facing update
-- record live identifiers that will still matter after recovery, including approvals, job IDs, sessions, processes, ports, and file paths
+- update `memory/active-task.md` before restart
+- record the live identifiers that will matter after restart
 - create a one-shot fallback cron job for intentional restarts and persist its `jobId`
-- resume the top unfinished task immediately after restart when it is safe and not blocked
-- send the proactive restart update in the first substantive reply after recovery
-- clear stale fallback state after successful resumption so the recovery trail stays clean
+- resume the top unfinished task immediately when safe
+- send the proactive restart update in the first substantive reply
+- remove or disable the fallback cron job once successful resumption is confirmed
+
+**Note:** `restart-continuity` also owns `memory/active-task.md` management and sync rules (merged from the deprecated `task-state-sync` skill). This skill now defines:
+
+- when to update `memory/active-task.md`
+- the active-task format
+- consistency verification with `TODO.md`
+- interaction patterns with `todo-continuity`
 
 ## Workflow summary
 
 A normal `restart-continuity` pass looks like this:
 
-1. Capture the real top task in `memory/active-task.md` before restart.
-2. Persist the identifiers and exact next step required for post-restart recovery.
-3. Schedule a one-shot fallback cron job for intentional restarts.
-4. Restart the gateway only after the recovery trail is complete.
-5. Read `memory/active-task.md` first after restart and resume the unfinished top task.
-6. Tell the user what resumed, then remove stale fallback state.
+1. Capture the real top task state in `memory/active-task.md`: goal, current status, blockers, next action, and queued user-facing update.
+2. Persist any live identifiers that matter: approvals, sessions, processes, jobs, ports, or file paths.
+3. Create a one-shot fallback cron job for intentional restarts and persist its `jobId` in `memory/active-task.md`.
+4. Resume the top unfinished task immediately when safe.
+5. Send the proactive restart update in the first substantive reply.
+6. Remove stale fallback state after successful resumption so the recovery trail stays clean.
+
+This is operational hygiene, not operational debugging that determines whether restart recovery is trustworthy.
 
 ## When to use it
 
-Reach for `restart-continuity` when the question is not "how should this workflow work in general?" but "how do we survive a restart without dropping the active task?"
+Reach for `restart-continuity` when the question is not "how should this workflow work in general?" but "how do we survive a restart without losing the plot?"
 
 Typical triggers:
 
-- "Restart the gateway, but make sure this publish job continues afterward."
-- "We restarted in the middle of work; resume the correct task first."
-- "Persist the approvals and next step before restarting."
-- "Send the user a proactive update once the task is resumed."
+- "Restart the gateway, but make sure this task resumes first."
+- "We restarted in the middle of work; resume the correct task now."
+- "The approvals disappeared after restart; persist them for next time."
+- "Schedule a restart fallback job so the user gets an update if recovery fails."
+- "Send the user a proactive restart update once the task is resumed."
 
-## Representative outcomes
-
-### Planned restart during active work
-
-A gateway restart is required while a repository publish, review, or debugging task is still in progress.
-
-A good agent should record the true top task, persist the important IDs, schedule the fallback cron job, and restart only after the recovery instructions are durable.
-
-### Post-restart recovery
-
-The environment comes back after a planned or unplanned restart.
-
-A good agent should read `memory/active-task.md` before unrelated work, resume the unfinished top task when safe, and tell the user what resumed in the first substantive reply.
-
-### Cleanup after successful resumption
-
-The resumed task completes or another unfinished task becomes primary.
-
-A good agent should clear stale restart state, remove any fallback cron job, and either empty or rewrite `memory/active-task.md` so the next top task is accurate.
-
-## Related skill repos
+## Related skills
 
 These repositories are related examples, not required dependencies:
 
-- `task-orchestrator`: orchestration-focused companion for multitask scheduling and prioritization - <https://github.com/ruanrrn/task-orchestrator>
-- `task-state-sync`: state-accuracy companion for keeping continuity files aligned during live work - <https://github.com/ruanrrn/task-state-sync>
-- `multi-task-continuity`: umbrella repo that combines orchestration, state sync, and restart-safe recovery - <https://github.com/ruanrrn/multi-task-continuity>
+- `task-orchestrator`: scheduling, prioritization, and staged progress policy - <https://github.com/ruanrrn/task-orchestrator>
+- `todo-continuity`: TODO.md owner, per-chat task queues, and state alignment - <https://github.com/ruanrrn/todo-continuity>
 
-Start here when the main failure happens at the restart boundary.
+Start here when the main failure pattern is the restart boundary.
 
 ## Install
 
@@ -123,20 +96,18 @@ Use either path:
 
 - `restart-continuity/` - the skill source
 - `dist/restart-continuity.skill` - the packaged artifact ready to import
-- `assets/social-preview.svg` - the repository banner and suggested social-preview asset
+- `assets/social-preview.svg` - the repository banner and suggested social preview asset
 
 ## Social preview
 
-Suggested social preview asset: `assets/social-preview.svg`
+![restart-continuity social preview](assets/social-preview.svg)
 
-Suggested one-line copy:
-
-> Preserve and resume in-flight work across restarts without losing the active task.
+> Keep `memory/active-task.md` and the top task alive across restarts.
 
 GitHub note:
 
 - The current `gh` CLI and GraphQL `UpdateRepositoryInput` do not expose a writable custom social preview field.
-- To use this image as the repository social preview, upload `assets/social-preview.svg` manually in the repo settings UI.
+- If the repo should use that image in GitHub's settings UI, say so directly in the README.
 
 ## Repository layout
 
@@ -144,28 +115,30 @@ GitHub note:
 restart-continuity/
 ├── LICENSE
 ├── README.md
-├── README.zh-CN.md
-├── CONTRIBUTING.md
-├── assets/
-│   └── social-preview.svg
 ├── restart-continuity/
 │   └── SKILL.md
+├── assets/
+│   └── social-preview.svg
 └── dist/
     └── restart-continuity.skill
 ```
 
 ## Contributing
 
-See `CONTRIBUTING.md` for contribution scope, PR expectations, and the repo boundary that keeps this project focused on restart-safe recovery instead of broader continuity tooling.
+See `CONTRIBUTING.md` for contribution scope, PR guidelines, and what changes belong in the repo versus what should go to the broader continuity family.
 
 ## Release hygiene
 
-- regenerate `dist/restart-continuity.skill` after each material skill change
-- keep `README.md`, `README.zh-CN.md`, `SKILL.md`, and repository metadata aligned
-- preserve the narrow scope: restart continuity first, broader workflow concerns elsewhere
-- remove stale restart examples, IDs, or wording that could imply the repo owns more than it does
+- Tag releases with semantic versioning (v1.0.0, v1.0.1, etc.)
+- Keep `CHANGELOG.md` updated with user-facing changes
+- Regenerate `dist/restart-continuity.skill` after any `SKILL.md` changes
+- Test restart fallback scheduling and active-task resumption before release
+
+## License
+
+MIT
 
 ## Repository
 
-- GitHub: `https://github.com/ruanrrn/restart-continuity`
+- GitLab: https://gitlab.com/ruanrrn/restart-continuity
 - License: MIT
