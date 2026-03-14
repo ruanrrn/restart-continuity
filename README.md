@@ -1,9 +1,20 @@
 # Restart Continuity
 
-![Engage | [RESTART CONTINUITY BANNER](assets/social-preview.svg)
-![Focus State Recovery](https://img.shields.io/badge/focus-state_recovery-success?style=flat-square&labelColor=18324A)
+English | [简体中文](README.zh-CN.md)
 
-An OpenClaw skill for preserving and resuming in-flight work across gateway restarts, session resets, and planned restarts.
+![Restart Continuity banner](assets/social-preview.svg)
+
+![OpenClaw Skill](https://img.shields.io/badge/OpenClaw-Skill-111827?style=flat-square)
+![Focus-State Recovery](https://img.shields.io/badge/Focus-State%20Recovery-Success?style=flat-square&labelColor=111827)
+![Works-Standalone](https://img.shields.io/badge/Works-Standalone-F9FAFB?style=flat-square&labelColor=1F2937)
+![Artifact-.skill Included](https://img.shields.io/badge/Artifact-.skill%20Included-FDE68A?style=flat-square&labelColor=1F2937)
+![README-Bilingual](https://img.shields.io/badge/README-Bilingual-F9FAFB?style=flat-square&labelColor=92400E)
+![License-MIT](https://img.shields.io/badge/License-MIT-F9FAFB?style=flat-square&labelColor=111827)
+
+An OpenClaw skill for preserving and resuming in-flight work across gateway restarts, session resets and planned restarts.
+
+> [!IMPORTANT]
+> This standard applies only to repositories whose primary artifact is an OpenClaw skill. It is not a general README, branding, or GitHub styling guide for apps, libraries, or mixed-purpose codebases.
 
 ## Overview
 
@@ -11,12 +22,12 @@ An OpenClaw skill for preserving and resuming in-flight work across gateway rest
 
 It tells an agent how to:
 
-- preserve the active top task before a restart
+- preserve active top task before a restart
 - resume that task immediately after restart
 - send the user a proactive restart update
 - schedule one-shot fallback cron jobs for intentional restarts
 
-The repo is intentionally small. It does not choose scheduling strategy, manage broad task workflow policy, or orchestrate parallel work. It exists to restart-safely recover the active task, carry forward identifiers and next action that would otherwise be lost, and proactively resume what work once the environment is back.
+The repo is intentionally small. It does not choose scheduling strategy, manage broad task workflow policy, or orchestrate parallel work. It exists to restart-safely recover the active task, carry forward identifiers and next action that would otherwise be lost, and proactively resume what work once environment is back.
 
 ## Why this exists
 
@@ -35,10 +46,10 @@ Use this skill when the main problem is restart-boundary continuity:
 
 ## What this skill covers
 
-The skill standardizes the operational processes that Determian whether restart recovery works correctly:
+The skill standardizes the operational processes that determine whether restart recovery works correctly:
 
 - update `memory/active-task.md` before restart
-- record the live identifiers that will matter after restart
+- record live identifiers that will matter after restart
 - create a one-shot fallback cron job for intentional restarts and persist its `jobId`
 - resume the top unfinished task immediately when safe
 - send the proactive restart update in the first substantive reply
@@ -60,7 +71,7 @@ A normal `restart-continuity` pass looks like this:
 3. Create a one-shot fallback cron job for intentional restarts and persist its `jobId` in `memory/active-task.md`.
 4. Resume the top unfinished task immediately when safe.
 5. Send the proactive restart update in the first substantive reply.
-6. Remove stale fallback state after successful resumption so the recovery trail stays clean.
+6. Remove the stale fallback state after successful resumption so the recovery trail stays clean.
 
 This is operational hygiene, not operational debugging that determines whether restart recovery is trustworthy.
 
@@ -76,14 +87,14 @@ Typical triggers:
 - "Schedule a restart fallback job so the user gets an update if recovery fails."
 - "Send the user a proactive restart update once the task is resumed."
 
-## Related skills
+## Related skill repos
 
-These repositories are related examples, not required dependencies:
+This skill is part of a continuity family. For state persistence and restart recovery:
 
-- `task-orchestrator`: scheduling, prioritization, and staged progress policy - <https://github.com/ruanrrn/task-orchestrator>
-- `todo-continuity`: TODO.md owner, per-chat task queues, and state alignment - <https://github.com/ruanrrn/todo-continuity>
+- **todo-continuity** - Per-chat TODO.md ownership. Use when tasks span turns and `TODO.md` needs to stay accurate: <https://github.com/ruanrrn/todo-continuity>
+- **task-orchestrator** - Decision layer for multi-task coordination. Use when the conversation pattern is multi-task coordination: <https://github.com/ruanrrn/task-orchestrator>
 
-Start here when the main failure pattern is the restart boundary.
+**Note:** `task-state-sync` was deprecated in March 2026. Its functionality has been merged into `todo-continuity` (for `TODO.md`) and `restart-continuity` (for `memory/active-task.md`). This skill now delegates to those two instead of `task-state-sync`.
 
 ## Install
 
@@ -96,18 +107,19 @@ Use either path:
 
 - `restart-continuity/` - the skill source
 - `dist/restart-continuity.skill` - the packaged artifact ready to import
-- `assets/social-preview.svg` - the repository banner and suggested social preview asset
+- `assets/social-preview.svg` - the repository banner and suggested social-preview asset
 
 ## Social preview
 
-![restart-continuity social preview](assets/social-preview.svg)
+Suggested social preview asset: `assets/social-preview.svg`
+
+Suggested one-line copy:
 
 > Keep `memory/active-task.md` and the top task alive across restarts.
 
-GitHub note:
-
-- The current `gh` CLI and GraphQL `UpdateRepositoryInput` do not expose a writable custom social preview field.
-- If the repo should use that image in GitHub's settings UI, say so directly in the README.
+> [!NOTE]
+> The public `gh` CLI and GraphQL `UpdateRepositoryInput` do not expose a writable custom social preview field.
+> To use this image as the repository's social preview, upload `assets/social-preview.svg` manually in the repository settings UI.
 
 ## Repository layout
 
@@ -115,6 +127,7 @@ GitHub note:
 restart-continuity/
 ├── LICENSE
 ├── README.md
+├── README.zh-CN.md
 ├── restart-continuity/
 │   └── SKILL.md
 ├── assets/
@@ -125,7 +138,7 @@ restart-continuity/
 
 ## Contributing
 
-See `CONTRIBUTING.md` for contribution scope, PR guidelines, and what changes belong in the repo versus what should go to the broader continuity family.
+See `CONTRIBUTING.md` for contribution scope, PR expectations, and what changes belong in this repo versus what should go to broader continuity work.
 
 ## Release hygiene
 
@@ -140,5 +153,5 @@ MIT
 
 ## Repository
 
-- GitLab: https://gitlab.com/ruanrrn/restart-continuity
+- GitHub: https://github.com/ruanrrn/restart-continuity
 - License: MIT
