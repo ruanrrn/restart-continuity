@@ -2,8 +2,6 @@
 
 English | [简体中文](README.zh-CN.md)
 
-![Restart Continuity banner](assets/social-preview.svg)
-
 ![OpenClaw Skill](https://img.shields.io/badge/OpenClaw-Skill-111827?style=flat-square)
 ![Focus-State Recovery](https://img.shields.io/badge/Focus-State%20Recovery-Success?style=flat-square&labelColor=111827)
 ![Works-Standalone](https://img.shields.io/badge/Works-Standalone-F9FAFB?style=flat-square&labelColor=1F2937)
@@ -27,7 +25,7 @@ It tells an agent how to:
 - send the user a proactive restart update
 - schedule one-shot fallback cron jobs for intentional restarts
 
-The repo is intentionally small. It does not choose scheduling strategy, manage broad task workflow policy, or orchestrate parallel work. It exists to restart-safely recover the active task, carry forward identifiers and next action that would otherwise be lost, and proactively resume what work once environment is back.
+The repo is intentionally small. It does not choose scheduling strategy, manage broad task workflow policy, or orchestrate parallel work. It exists to restart-safely recover the active task, carry forward identifiers and next action that would otherwise be lost, and proactively resume the work once environment is back.
 
 ## Why this exists
 
@@ -107,19 +105,6 @@ Use either path:
 
 - `restart-continuity/` - the skill source
 - `dist/restart-continuity.skill` - the packaged artifact ready to import
-- `assets/social-preview.svg` - the repository banner and suggested social-preview asset
-
-## Social preview
-
-Suggested social preview asset: `assets/social-preview.svg`
-
-Suggested one-line copy:
-
-> Keep `memory/active-task.md` and the top task alive across restarts.
-
-> [!NOTE]
-> The public `gh` CLI and GraphQL `UpdateRepositoryInput` do not expose a writable custom social preview field.
-> To use this image as the repository's social preview, upload `assets/social-preview.svg` manually in the repository settings UI.
 
 ## Repository layout
 
@@ -130,8 +115,6 @@ restart-continuity/
 ├── README.zh-CN.md
 ├── restart-continuity/
 │   └── SKILL.md
-├── assets/
-│   └── social-preview.svg
 └── dist/
     └── restart-continuity.skill
 ```
